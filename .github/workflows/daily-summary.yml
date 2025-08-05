@@ -1,0 +1,20 @@
+name: Daily Team Summary
+on:
+  schedule:
+    # Runs at 10:00 AM Central Time (3:00 PM UTC during standard time, 2:00 PM UTC during daylight time)
+    # Using 15:00 UTC to cover Central Standard Time (CST)
+    - cron: '0 15 * * 1-5'  # Monday through Friday at 3 PM UTC
+  workflow_dispatch:  # Allows manual triggering for testing
+
+jobs:
+  send-daily-summary:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Call Supabase Edge Function
+      run: |
+        curl -X POST \
+          -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
+          -H "Content-Type: application/json" \
+          -d '{"scheduled": true}' \
+          "${{ secrets.SUPABASE_URL }}/functions/v1/automated-daily-summary"
